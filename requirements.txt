@@ -1,0 +1,4 @@
+# Personal Finance Tracker — Dependencies
+# This project uses Python standard library only.
+# No external packages required.
+# Python >= 3.10
