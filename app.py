@@ -1,36 +1,27 @@
 from flask import Flask, jsonify
-from collections import defaultdict
-from finance_tracker import load_transactions, summarise
+import pandas as pd
 import os
 
 app = Flask(__name__)
 
 @app.route("/")
 def index():
-    return jsonify({
-        "status": "ok",
-        "message": "Personal Finance Tracker API is live",
-        "endpoints": ["/summary", "/health"]
-    })
-
-@app.route("/health")
-def health():
-    return jsonify({"status": "healthy"})
+    return jsonify({"status": "ok", "message": "Finance Tracker is live"})
 
 @app.route("/summary")
 def summary():
-    path = os.path.join("data", "transactions.csv")
-    transactions = load_transactions(path)
-    result = []
-    for tx in transactions:
-        result.append({
-            "month": tx["month"],
-            "description": tx["description"],
-            "amount": tx["amount"],
-            "type": tx["type"],
-            "category": tx["category"]
-        })
-    return jsonify({"total": len(result), "transactions": result})
+    data = pd.read_csv("data/transactions.csv")
+    food = 0
+    transport = 0
+    other = 0
+    for i in range(len(data)):
+        if data["description"][i] == "food":
+            food += data["amount"][i]
+        elif data["description"][i] == "transport":
+            transport += data["amount"][i]
+        else:
+            other += data["amount"][i]
+    return jsonify({"food": int(food), "transport": int(transport), "other": int(other)})
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
